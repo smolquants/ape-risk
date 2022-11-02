@@ -52,7 +52,12 @@ setup(
     author_email="admin@apeworx.io",
     url="https://github.com/ApeWorX/ape-risk",
     include_package_data=True,
-    install_requires=[],
+    install_requires=[
+        "eth-ape>=0.5.2,<0.6.0",
+        "pandas",
+        "scipy",
+        "numpy",
+    ],
     python_requires=">=3.8,<4",
     extras_require=extras_require,
     py_modules=["ape_risk"],

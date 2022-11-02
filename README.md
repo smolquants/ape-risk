@@ -1,6 +1,6 @@
 # Quick Start
 
-Like [`slither`](https://github.com/crytic/slither), but for common economic attacks in DeFi.
+Like [`slither`](https://github.com/crytic/slither), but for common economic exploits in DeFi.
 
 ## Dependencies
 
