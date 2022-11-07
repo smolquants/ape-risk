@@ -45,7 +45,7 @@ setup(
     name="ape-risk",
     use_scm_version=True,
     setup_requires=["setuptools_scm"],
-    description="""ape-risk: DeFi economic risk analysis as an ApeWorX plugin""",
+    description="""ape-risk: DeFi risk analysis as an ApeWorX plugin""",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="ApeWorX Ltd.",
