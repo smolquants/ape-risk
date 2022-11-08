@@ -27,3 +27,17 @@ def test_sims(mc):
     # fit and check params close
     params = mc.dist.fit(nd_samples_reshaped)
     np.testing.assert_allclose(params, mc.params, rtol=1e-2)
+
+
+def test_fit(mc):
+    params = list(np.asarray(mc.params) * 0.5)  # new params
+
+    # generate data
+    size = mc.num_points * mc.num_sims
+    nd_samples = mc.dist.rvs(*params, size=size)
+
+    # fit mc.params to data
+    mc.fit(nd_samples)
+
+    # check mc.params refit to close to new params
+    np.testing.assert_allclose(params, mc.params, rtol=1e-2)

@@ -56,7 +56,7 @@ setup(
         "eth-ape>=0.5.2,<0.6.0",
         "pandas",
         "scipy",
-        "numpy",
+        "numpy>=1.21,<2.0",
     ],
     python_requires=">=3.8,<4",
     extras_require=extras_require,
