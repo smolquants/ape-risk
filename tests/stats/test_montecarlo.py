@@ -1,15 +1,21 @@
 import numpy as np
+import pytest
 
-from ape_risk.stats.montecarlo import generate_rvs
+from ape_risk.stats.montecarlo import MonteCarlo
 
 
-def test_generate_rvs(norm):
+@pytest.fixture
+def mc():
+    return MonteCarlo()
+
+
+def test_generate_rvs(mc, norm):
     num_points = 100000
     num_sims = 10
     args = [0.1, 0.001]  # loc, scale
 
     # generate samples and check return shape is correct
-    nd_samples = generate_rvs(*args, dist=norm, num_points=num_points, num_sims=num_sims)
+    nd_samples = mc.generate_rvs(*args, dist=norm, num_points=num_points, num_sims=num_sims)
     assert isinstance(nd_samples, np.ndarray)
     assert nd_samples.shape == (num_points, num_sims)
 
