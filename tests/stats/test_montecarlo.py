@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from scipy import stats
+from scipy import stats  # type: ignore
 
 
 def test_dist(mc):
