@@ -12,7 +12,6 @@ class MonteCarlo(BaseModel):
 
     Attrs:
         dist_type (str): The continuous distribution to sample from.
-        params (Tuple[float]): The parameter arguments (e.g. loc, scale) of `dist`.
         num_points (int): The number of points to generate for each sim.
         num_sims (int): The number of sims.
 
@@ -63,6 +62,9 @@ class MonteCarlo(BaseModel):
     def freeze(self, params: npt.ArrayLike):
         """
         Freezes the distribution as a random variable using the given params.
+
+        Args:
+            params (npt.ArrayLike): The parameter arguments (e.g. loc, scale) of `rv`.
         """
         self._rv = self.dist(*params)
 
@@ -75,6 +77,9 @@ class MonteCarlo(BaseModel):
     def fit(self, data: npt.ArrayLike):
         """
         Fits distribution params then freezes as random variable using the given data.
+
+        Args:
+            data (npt.ArrayLike): The data to fit the random variable params from.
         """
         params = self.dist.fit(data)
         self.freeze(params)
