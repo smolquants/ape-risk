@@ -72,7 +72,7 @@ def gbms(
         check_type(list, hist_data, "hist_data")
 
         # fit to log differences: log(p[i+1] / p[i])
-        hist_data = np.diff(np.log(np.asarray(hist_data)))
+        hist_data = np.diff(np.log(np.asarray(hist_data))).tolist()
 
     from ape_risk.strategies.simulation import SimulationStrategy
 
