@@ -1,0 +1,6 @@
+name: ape-risk
+
+plugins:
+  - name: notebook
+
+default_ecosystem: ethereum
