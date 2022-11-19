@@ -8,6 +8,10 @@ from ape_risk.stats import MonteCarlo
 
 
 class SimulationStrategy(st.SearchStrategy):
+    """
+    Monte Carlo simulation strategy.
+    """
+
     _mc: MonteCarlo
 
     def __init__(
