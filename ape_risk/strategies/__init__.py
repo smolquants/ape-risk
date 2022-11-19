@@ -1,5 +1,5 @@
-from .simulation import Simulation
+from .simulation import SimulationStrategy
 
 __all__ = [
-    "Simulation",
+    "SimulationStrategy",
 ]

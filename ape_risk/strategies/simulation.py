@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 
 import numpy.typing as npt
 from hypothesis import strategies as st
@@ -7,18 +7,20 @@ from hypothesis.internal.conjecture.data import ConjectureData
 from ape_risk.stats import MonteCarlo
 
 
-class Simulation(st.SearchStrategy):
+class SimulationStrategy(st.SearchStrategy):
+    _mc: MonteCarlo
+
     def __init__(
         self,
         dist_type: str,
         num_points: int,
-        params: npt.ArrayLike,
-        hist_data: Optional[npt.ArrayLike] = None,
+        params: List,
+        hist_data: Optional[List] = None,
     ):
         # init the monte carlo simulator
         self._mc = MonteCarlo(
-            dist_type=self.dist_type,
-            num_points=self.num_points,
+            dist_type=dist_type,
+            num_points=num_points,
             num_sims=1,  # for each hypothesis run to be a single sim
         )
         self._mc.freeze(params)
