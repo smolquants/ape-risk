@@ -15,7 +15,7 @@ extras_require = {
         "isort>=5.10.1",  # Import sorting linter
     ],
     "release": [  # `release` GitHub Action job uses this
-        "setuptools < 60.0",  # Installation tool
+        "setuptools<60.0",  # Installation tool
         "wheel",  # Packaging tool
         "twine",  # Package upload tool
     ],
