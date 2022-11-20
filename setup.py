@@ -7,8 +7,6 @@ extras_require = {
         "pytest>=6.0",  # Core testing package
         "pytest-xdist",  # multi-process runner
         "pytest-cov",  # Coverage analyzer plugin
-        "hypothesis>=6.2.0,<7.0",  # Strategy-based fuzzer
-        "matplotlib",  # plots
     ],
     "lint": [
         "black>=22.6.0",  # auto-formatter and linter
@@ -17,7 +15,7 @@ extras_require = {
         "isort>=5.10.1",  # Import sorting linter
     ],
     "release": [  # `release` GitHub Action job uses this
-        "setuptools",  # Installation tool
+        "setuptools < 60.0",  # Installation tool
         "wheel",  # Packaging tool
         "twine",  # Package upload tool
     ],
@@ -27,6 +25,7 @@ extras_require = {
         "pytest-watch",  # `ptw` test watcher/runner
         "IPython",  # Console for interacting
         "ipdb",  # Debugger (Must use `export PYTHONBREAKPOINT=ipdb.set_trace`)
+        "matplotlib",  # plots
     ],
 }
 
@@ -49,15 +48,16 @@ setup(
     description="""ape-risk: DeFi risk analysis as an ApeWorX plugin""",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    author="ApeWorX Ltd.",
-    author_email="admin@apeworx.io",
-    url="https://github.com/ApeWorX/ape-risk",
+    author="smolquants",
+    author_email="dev@smolquants.xyz",
+    url="https://github.com/smolquants/ape-risk",
     include_package_data=True,
     install_requires=[
         "eth-ape>=0.5.2,<0.6.0",
         "pandas",
         "scipy",
         "numpy>=1.21,<2.0",
+        "hypothesis>=6.2.0,<7.0",  # Strategy-based fuzzer
     ],
     python_requires=">=3.8,<4",
     extras_require=extras_require,
