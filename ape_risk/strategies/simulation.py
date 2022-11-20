@@ -40,6 +40,18 @@ class SimulationStrategy(st.SearchStrategy):
             self._mc.fit(hist_data)
 
     def do_draw(self, data: ConjectureData) -> npt.ArrayLike:
-        seed = data.draw_bits(32)
-        np.random.seed(seed)  # TODO: fix this random.seed is deprecated/old
+        """
+        Draws a new Monte Carlo simulation using a 32-bit generated seed.
+
+        Args:
+            data (:class:`hypothesis.internal.conjecture.data.ConjectureData`):
+                The conjecture data for the draw.
+
+        Returns:
+            numpy.typing.ArrayLike
+        """
+        seed = data.draw_bits(32)  # 32 bits is max for seed to np.random.seed
+        np.random.seed(
+            seed
+        )  # TODO: fix since not best practice; see: https://numpy.org/devdocs/reference/random/generated/numpy.random.RandomState.seed.html  # noqa: E501
         return self._mc.sims()

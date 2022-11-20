@@ -81,6 +81,6 @@ def gbms(
     )
 
     def pack(x: npt.ArrayLike) -> npt.ArrayLike:
-        return initial_value * np.exp(np.cumsum(x))
+        return initial_value * np.exp(np.cumsum(x, axis=0))  # axis=0 sums over rows
 
     return strat.map(pack)

@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+from hypothesis.internal.conjecture.data import ConjectureData
 
 from ape_risk.stats import MonteCarlo
 from ape_risk.strategies import SimulationStrategy
@@ -65,4 +66,22 @@ def test_init_with_hist_data_raises_when_num_points_gt_len_hist():
         )
 
 
-# TODO: def test_do_draw():
+def test_do_draw():
+    dist_type = "norm"
+    num_points = 100000
+    params = [0.1, 0.001]  # loc, scale
+    sim_strat = SimulationStrategy(
+        dist_type=dist_type,
+        num_points=num_points,
+        params=params,
+    )
+
+    # SEE:https://github.com/HypothesisWorks/hypothesis/blob/master/hypothesis-python/tests/conjecture/test_utils.py  # noqa: E501
+    data = ConjectureData.for_buffer(bytes(8))
+    draw = sim_strat.do_draw(data=data)
+    assert draw.shape == (100000, 1)
+    assert isinstance(draw, np.ndarray)
+
+    # check draw has fit close to params
+    sim_strat._mc.fit(draw)
+    np.testing.assert_allclose(sim_strat._mc.params, params, rtol=1e-2)
