@@ -71,6 +71,9 @@ class MonteCarlo(BaseModel):
     def sims(self) -> npt.ArrayLike:
         """
         Generates iid samples from given distribution for size = (num_points, num_sims).
+
+        Returns:
+            numpy.typing.ArrayLike
         """
         return self.rv.rvs(size=(self.num_points, self.num_sims))
 
