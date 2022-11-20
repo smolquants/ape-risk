@@ -1,5 +1,6 @@
 from typing import List, Optional
 
+import numpy as np
 import numpy.typing as npt
 from hypothesis import strategies as st
 from hypothesis.internal.conjecture.data import ConjectureData
@@ -39,4 +40,6 @@ class SimulationStrategy(st.SearchStrategy):
             self._mc.fit(hist_data)
 
     def do_draw(self, data: ConjectureData) -> npt.ArrayLike:
+        seed = data.draw_bits(32)
+        np.random.seed(seed)  # TODO: fix this random.seed is deprecated/old
         return self._mc.sims()

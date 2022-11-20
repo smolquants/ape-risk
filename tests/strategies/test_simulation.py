@@ -65,22 +65,4 @@ def test_init_with_hist_data_raises_when_num_points_gt_len_hist():
         )
 
 
-def test_do_draw():
-    dist_type = "norm"
-    num_points = 100000
-    params = [0.1, 0.001]  # loc, scale
-    sim_strat = SimulationStrategy(
-        dist_type=dist_type,
-        num_points=num_points,
-        params=params,
-    )
-
-    np.random.seed(0)
-    drawn = sim_strat.do_draw(data=None)
-
-    np.random.seed(0)
-    sim = sim_strat._mc.sims()
-
-    assert isinstance(drawn, np.ndarray) is True
-    assert drawn.size == num_points
-    np.testing.assert_equal(drawn, sim)
+# TODO: def test_do_draw():
