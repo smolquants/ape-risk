@@ -1,6 +1,6 @@
 # Quick Start
 
-Like [`slither`](https://github.com/crytic/slither), but for common economic exploits in DeFi.
+Tools for analyzing risk in DeFi.
 
 ## Dependencies
 
