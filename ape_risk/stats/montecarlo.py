@@ -99,26 +99,38 @@ class MultivariateMonteCarlo(MonteCarlo):
 
     num_rvs: int
 
-    _c: Optional[npt.ArrayLike] = None
-    _d: Optional[npt.ArrayLike] = None
+    _scale: Optional[np.ndarray] = None
+    _shift: Optional[np.ndarray] = None
 
-    def mix(self, c: npt.ArrayLike, d: npt.ArrayLike):
+    @property
+    def scale(self) -> np.ndarray:
+        if self._scale is None:
+            raise Exception("dist not mixed with transform properties")
+        return self._scale
+
+    @property
+    def shift(self) -> np.ndarray:
+        if self._shift is None:
+            raise Exception("dist not mixed with transform properties")
+        return self._shift
+
+    def mix(self, scale: np.ndarray, shift: np.ndarray):
         """
         Sets the mixing transformation properties to use in generating correlated
         sims from iid random variables.
 
         Args:
-            c (npt.ArrayLike): The scale matrix.
-            d (npt.ArrayLike): The shift vector.
+            scale (npt.ArrayLike): The scale matrix.
+            shift (npt.ArrayLike): The shift vector.
         """
         # check shapes
-        if c.shape != (self.num_rvs, self.num_rvs):
+        if scale.shape != (self.num_rvs, self.num_rvs):
             raise ValueError(f"Scale matrix is not shape of ({self.num_rvs}, {self.num_rvs})")
-        if d.shape != (1, self.num_rvs):
+        if shift.shape != (1, self.num_rvs):
             raise ValueError(f"Shift vector is not shape of (1, {self.num_rvs})")
 
-        self._c = c
-        self._d = d
+        self._scale = scale
+        self._shift = shift
 
     def sims(self) -> npt.ArrayLike:
         """
@@ -129,7 +141,7 @@ class MultivariateMonteCarlo(MonteCarlo):
             numpy.typing.ArrayLike
         """
         x = self.rv.rvs(size=(self.num_points, self.num_sims, self.num_rvs))
-        return np.einsum("ij,nmj->nmi", self._c, x) + self._d
+        return np.einsum("ij,nmj->nmi", self.scale, x) + self.shift
 
     def fit(self, data: npt.ArrayLike):
         """
