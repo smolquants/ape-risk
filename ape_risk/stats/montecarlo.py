@@ -14,8 +14,6 @@ class MonteCarlo(BaseModel):
         dist_type (str): The continuous distribution to sample from.
         num_points (int): The number of points to generate for each sim.
         num_sims (int): The number of sims.
-
-        TODO: correlation matrix, estimated density
     """
 
     dist_type: str
@@ -86,3 +84,58 @@ class MonteCarlo(BaseModel):
         """
         params = self.dist.fit(data)
         self.freeze(params)
+
+
+class MultivariateMonteCarlo(MonteCarlo):
+    """
+    Multivariate monte carlo simulator.
+
+    Attrs:
+        dist_type (str): The continuous distribution to sample from.
+        num_points (int): The number of points to generate for each sim.
+        num_sims (int): The number of sims.
+        num_rvs (int): The number of rvs to use for sims.
+    """
+
+    num_rvs: int
+
+    _c: Optional[npt.ArrayLike] = None
+    _d: Optional[npt.ArrayLike] = None
+
+    def mix(self, c: npt.ArrayLike, d: npt.ArrayLike):
+        """
+        Sets the mixing transformation properties to use in generating correlated
+        sims from iid random variables.
+
+        Args:
+            c (npt.ArrayLike): The scale matrix.
+            d (npt.ArrayLike): The shift vector.
+        """
+        # check shapes
+        if c.shape != (self.num_rvs, self.num_rvs):
+            raise ValueError(f"Scale matrix is not shape of ({self.num_rvs}, {self.num_rvs})")
+        if d.shape != (1, self.num_rvs):
+            raise ValueError(f"Shift vector is not shape of (1, {self.num_rvs})")
+
+        self._c = c
+        self._d = d
+
+    def sims(self) -> npt.ArrayLike:
+        """
+        Generates correlated samples from given distribution for
+        size = (num_points, num_sims, num_rvs).
+
+        Returns:
+            numpy.typing.ArrayLike
+        """
+        x = self.rv.rvs(size=(self.num_points, self.num_sims, self.num_rvs))
+        return np.einsum("ij,nmj->nmi", self._c, x) + self._d
+
+    def fit(self, data: npt.ArrayLike):
+        """
+        Fits distribution params then freezes as random variable using the given data.
+
+        Args:
+            data (npt.ArrayLike): The data to fit the random variable params from.
+        """
+        raise NotImplementedError("fit not implemented.")
