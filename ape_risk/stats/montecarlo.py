@@ -90,6 +90,9 @@ class MultivariateMonteCarlo(MonteCarlo):
     """
     Multivariate monte carlo simulator.
 
+    Assumes rvs are in stable family of distributions to allow
+    decomposition into linear combination of iid rvs of same type.
+
     Attrs:
         dist_type (str): The continuous distribution to sample from.
         num_points (int): The number of points to generate for each sim.
@@ -98,6 +101,12 @@ class MultivariateMonteCarlo(MonteCarlo):
     """
 
     num_rvs: int
+    supported_dist_types: ClassVar[Tuple] = (
+        stats.cauchy,
+        stats.levy,
+        stats.levy_stable,
+        stats.norm,
+    )
 
     _scale: Optional[np.ndarray] = None
     _shift: Optional[np.ndarray] = None
