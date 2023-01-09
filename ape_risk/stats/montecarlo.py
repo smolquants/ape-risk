@@ -98,10 +98,15 @@ class MultivariateMonteCarlo(MonteCarlo):
     """
 
     num_rvs: int
-    supported_dist_types: ClassVar[Tuple] = (stats.norm,)  # TODO: support more dists
 
     _scale: Optional[np.ndarray] = None
     _shift: Optional[np.ndarray] = None
+
+    @validator("dist_type")
+    def dist_type_supported(cls, v):
+        # TODO: support more dists
+        assert v == "norm", f"dist_type {v} not supported"
+        return v
 
     @property
     def scale(self) -> np.ndarray:
