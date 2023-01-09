@@ -27,8 +27,30 @@ def test_shift(mmc):
     np.testing.assert_equal(mmc_shift, shift)
 
 
-def test_mix(mmc):
-    pass
+def test_mix_sets_properties(mmc):
+    C = np.asarray([[1, 0.1, 0.2], [0.1, 1, 0.1], [0.2, 0.1, 1]])
+    scale = np.linalg.cholesky(C)
+    shift = np.asarray([0.1, 0.2, 0.3])
+    mmc.mix(scale, shift)
+
+    np.testing.assert_equal(mmc.scale, scale)
+    np.testing.assert_equal(mmc.shift, shift)
+
+
+def test_mix_fails_when_invalid_scale_shape(mmc):
+    C = np.asarray([[1, 0.1], [0.1, 1]])
+    scale = np.linalg.cholesky(C)
+    shift = np.asarray([0.1, 0.2, 0.3])
+    with pytest.raises(Exception):
+        mmc.mix(scale, shift)
+
+
+def test_mix_fails_when_invalid_shift_shape(mmc):
+    C = np.asarray([[1, 0.1, 0.2], [0.1, 1, 0.1], [0.2, 0.1, 1]])
+    scale = np.linalg.cholesky(C)
+    shift = np.asarray([0.1, 0.2])
+    with pytest.raises(Exception):
+        mmc.mix(scale, shift)
 
 
 def test_sims(mmc):

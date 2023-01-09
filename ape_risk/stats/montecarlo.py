@@ -132,7 +132,7 @@ class MultivariateMonteCarlo(MonteCarlo):
         # check shapes
         if scale.shape != (self.num_rvs, self.num_rvs):
             raise ValueError(f"Scale matrix is not shape of ({self.num_rvs}, {self.num_rvs})")
-        if shift.shape != (1, self.num_rvs):
+        if shift.shape != (self.num_rvs,):
             raise ValueError(f"Shift vector is not shape of (1, {self.num_rvs})")
 
         self._scale = scale
