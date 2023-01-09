@@ -82,6 +82,7 @@ class MonteCarlo(BaseModel):
         Args:
             data (np.ndarray): The data to fit the random variable params from.
         """
+        # TODO: check data shape
         params = self.dist.fit(data)
         self.freeze(params)
 
@@ -157,9 +158,10 @@ class MultivariateMonteCarlo(MonteCarlo):
         Args:
             data (np.ndarray): The data to fit the random variable params from.
         """
+        # TODO: check data shape
         # TODO: generalize to stable family
-        shift = np.mean(data, axis=1)
-        scale = np.cov(data)
+        shift = np.mean(data, axis=0)
+        scale = np.cov(data.T)
         params = (0, 1)  # standard normal
 
         self.freeze(params)
