@@ -37,7 +37,7 @@ class SimulationStrategy(st.SearchStrategy):
                     f"Sample size {self._mc.num_points} not in expected range 0 <= num_points <= {len(hist_data)}"  # noqa: E501
                 )
 
-            self._mc.fit(hist_data)
+            self._mc.fit(np.asarray(hist_data))
 
     def do_draw(self, data: ConjectureData) -> npt.ArrayLike:
         """
