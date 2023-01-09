@@ -8,7 +8,8 @@ def test_scale(mmc):
         _ = mmc.scale
 
     # test succeeds with manually set private attr
-    scale = np.asarray([[1, 0, 0], [0.01, 1, 0], [0.02, 0.01, 1]])
+    C = np.asarray([[1, 0.1, 0.2], [0.1, 1, 0.1], [0.2, 0.1, 1]])
+    scale = np.linalg.cholesky(C)
     mmc._scale = scale
     mmc_scale = mmc.scale
     np.testing.assert_equal(mmc_scale, scale)
@@ -20,7 +21,7 @@ def test_shift(mmc):
         _ = mmc.shift
 
     # test succeeds with manually set private attr
-    shift = np.asarray([0.001, 0.01, 0.1])
+    shift = np.asarray([0.1, 0.2, 0.3])
     mmc._shift = shift
     mmc_shift = mmc.shift
     np.testing.assert_equal(mmc_shift, shift)
