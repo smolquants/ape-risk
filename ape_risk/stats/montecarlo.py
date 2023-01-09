@@ -75,12 +75,12 @@ class MonteCarlo(BaseModel):
         """
         return self.rv.rvs(size=(self.num_points, self.num_sims))
 
-    def fit(self, data: npt.ArrayLike):
+    def fit(self, data: np.ndarray):
         """
         Fits distribution params then freezes as random variable using the given data.
 
         Args:
-            data (npt.ArrayLike): The data to fit the random variable params from.
+            data (np.ndarray): The data to fit the random variable params from.
         """
         params = self.dist.fit(data)
         self.freeze(params)
@@ -90,9 +90,6 @@ class MultivariateMonteCarlo(MonteCarlo):
     """
     Multivariate monte carlo simulator.
 
-    Assumes rvs are in stable family of distributions to allow
-    decomposition into linear combination of iid rvs of same type.
-
     Attrs:
         dist_type (str): The continuous distribution to sample from.
         num_points (int): The number of points to generate for each sim.
@@ -101,12 +98,7 @@ class MultivariateMonteCarlo(MonteCarlo):
     """
 
     num_rvs: int
-    supported_dist_types: ClassVar[Tuple] = (
-        stats.cauchy,
-        stats.levy,
-        stats.levy_stable,
-        stats.norm,
-    )
+    supported_dist_types: ClassVar[Tuple] = (stats.norm,)  # TODO: support more dists
 
     _scale: Optional[np.ndarray] = None
     _shift: Optional[np.ndarray] = None
@@ -152,11 +144,18 @@ class MultivariateMonteCarlo(MonteCarlo):
         x = self.rv.rvs(size=(self.num_points, self.num_sims, self.num_rvs))
         return np.einsum("ij,nmj->nmi", self.scale, x) + self.shift
 
-    def fit(self, data: npt.ArrayLike):
+    def fit(self, data: np.ndarray):
         """
-        Fits distribution params then freezes as random variable using the given data.
+        Fits distribution params then freezes as random variable and
+        mixes with affine transform using the given data.
 
         Args:
-            data (npt.ArrayLike): The data to fit the random variable params from.
+            data (np.ndarray): The data to fit the random variable params from.
         """
-        raise NotImplementedError("fit not implemented.")
+        # TODO: generalize to stable family
+        shift = np.mean(data, axis=1)
+        scale = np.cov(data)
+        params = (0, 1)  # standard normal
+
+        self.freeze(params)
+        self.mix(scale, shift)
