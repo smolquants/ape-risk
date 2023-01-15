@@ -162,7 +162,8 @@ class MultivariateMonteCarlo(MonteCarlo):
 
         # TODO: generalize to stable family
         shift = np.mean(data, axis=0)
-        scale = np.cov(data.T)
+        C = np.cov(data.T)
+        scale = np.linalg.cholesky(C)
         params = (0, 1)  # standard normal
 
         self.freeze(params)
