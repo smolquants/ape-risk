@@ -45,6 +45,57 @@ def sims(
 
 @cacheable
 @defines_strategy()
+def multi_sims(
+    *,
+    dist_type: str,
+    num_points: int,
+    num_rvs: int,
+    params: List,
+    scale: List[List],
+    shift: List,
+    hist_data: Optional[List[List]] = None,
+) -> st.SearchStrategy[npt.ArrayLike]:
+    """
+    Generates instances of ``np.ndarray``. The generated random instances
+    are individual runs of a multivariate Monte Carlo sim driven by the
+    specified distribution, with covariance determined by the given
+    scale matrix (Cholesky decomposition of covariance matrix).
+
+    Args:
+        dist_type (str): The continuous distribution to sample from.
+        num_points (int): The number of points to generate for each sim.
+        params (List): The base parameter arguments (e.g. loc, scale) of the random variables.
+        scale (List[List]): The scale matrix to mix random variables via affine transformation.
+        shift (List): The shift vector to translate random variables via affine transformation.
+        hist_data (Optional[List[List]]): Historical data to fit the random variable params from.
+
+    Returns:
+        :class:`hypothesis.strategies.SearchStrategy[numpy.typing.ArrayLike]`
+    """
+    check_type(str, dist_type, "dist_type")
+    check_type(int, num_points, "num_points")
+    check_type(int, num_rvs, "num_rvs")
+    check_type(list, params, "params")
+    check_type(list, scale, "scale")
+    check_type(list, shift, "shift")
+    if hist_data is not None:
+        check_type(list, hist_data, "hist_data")
+
+    from ape_risk.strategies.simulation import MultivariateSimulationStrategy
+
+    return MultivariateSimulationStrategy(
+        dist_type=dist_type,
+        num_points=num_points,
+        num_rvs=num_rvs,
+        params=params,
+        scale=scale,
+        shift=shift,
+        hist_data=hist_data,
+    )
+
+
+@cacheable
+@defines_strategy()
 def gbms(
     *,
     initial_value: float,
