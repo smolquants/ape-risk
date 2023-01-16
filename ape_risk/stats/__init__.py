@@ -1,5 +1,6 @@
-from .montecarlo import MonteCarlo
+from .montecarlo import MonteCarlo, MultivariateMonteCarlo
 
 __all__ = [
     "MonteCarlo",
+    "MultivariateMonteCarlo",
 ]
