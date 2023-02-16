@@ -134,18 +134,17 @@ def gbms(
         dist_type="norm", num_points=num_points, params=params, hist_data=hist_data
     )
 
-    shift = 0
+    shift = 0.0
     if r is not None:
         check_type(float, r, "r")
 
         # adjust for risk-neutral if given risk-free rate
-        # S_t = S_0 * exp(mu_p*t + sigma * W_t); mu_p = mu - sigma**2 / 2
-        [mu_p, sigma] = strat._mc.params.tolist()
-        mu = mu_p + sigma**2 / 2
-        shift = r - mu
+        # S_t = S_0 * exp((mu - sigma**2 / 2)*t + sigma * W_t)
+        [mu, sigma] = strat._mc.params.tolist()
+        shift = r - (mu - sigma**2 / 2)
 
     def pack(x: npt.ArrayLike) -> npt.ArrayLike:
-        return initial_value * np.exp(np.cumsum(x + shift, axis=0))  # axis=0 sums over rows
+        return initial_value * np.exp(np.cumsum(np.add(x, shift), axis=0))  # axis=0 sums over rows
 
     return strat.map(pack)
 

@@ -51,7 +51,7 @@ class MonteCarlo(BaseModel):
         return self._rv
 
     @property
-    def params(self) -> npt.ArrayLike:
+    def params(self) -> np.ndarray:
         """
         The distributional parameters of the random variable to sample from.
         """
