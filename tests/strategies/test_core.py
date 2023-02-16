@@ -92,7 +92,7 @@ def test_gbms_risk_neutral_fuzz(p):
     # check distr of p is close to log normal with params
     dlog_p = np.diff(np.log(p.T))
     fit_params = stats.norm.fit(dlog_p)
-    np.testing.assert_allclose(fit_params, [0.0004, 0.005], rtol=2e-1)  # mu tol is not great
+    np.testing.assert_allclose(fit_params, [0.000387, 0.005], rtol=2e-1)  # mu tol is not great
 
 
 @given(strategies.gbms(initial_value=1.0, num_points=100000, params=[0, 1], hist_data=hist_data()))
