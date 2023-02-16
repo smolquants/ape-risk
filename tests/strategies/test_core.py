@@ -90,7 +90,7 @@ def test_gbms_hist_fuzz(p):
 
 @given(
     strategies.multi_gbms(
-        initial_value=1.0,
+        initial_values=[1.0, 0.9, 0.8],
         num_points=100000,
         num_rvs=3,
         params=[0, 0.005],
@@ -101,6 +101,9 @@ def test_gbms_hist_fuzz(p):
 def test_multi_gbms_param_fuzz(p):
     assert p.shape == (100000, 1, 3)
     assert isinstance(p, np.ndarray)
+
+    # check initial values of sim close to same as specified (since start at t=1)
+    np.testing.assert_allclose(p.reshape((100000, 3))[0], [1.0, 0.9, 0.8], 0.005 * 10)
 
     # check distr of p is close to log normal with params
     dlog_p = np.diff(np.log(p.reshape(100000, 3)), axis=0)
@@ -116,7 +119,7 @@ def test_multi_gbms_param_fuzz(p):
 
 @given(
     strategies.multi_gbms(
-        initial_value=1.0,
+        initial_values=[1.0, 0.9, 0.8],
         num_points=100000,
         num_rvs=3,
         params=[0, 1],
@@ -128,6 +131,9 @@ def test_multi_gbms_param_fuzz(p):
 def test_multi_gbms_hist_fuzz(p):
     assert p.shape == (100000, 1, 3)
     assert isinstance(p, np.ndarray)
+
+    # check initial values of sim close to same as specified (since start at t=1)
+    np.testing.assert_allclose(p.reshape((100000, 3))[0], [1.0, 0.9, 0.8], 0.005 * 10)
 
     # check distr of p is close to log normal with params
     dlog_p = np.diff(np.log(p.reshape(100000, 3)), axis=0)

@@ -141,7 +141,7 @@ def gbms(
 @defines_strategy()
 def multi_gbms(
     *,
-    initial_value: float,
+    initial_values: List[float],
     num_points: int,
     num_rvs: int,
     params: List,
@@ -155,7 +155,7 @@ def multi_gbms(
     correlated Geometric Brownian motions.
 
     Args:
-        initial_value (float): The initial value of each sim.
+        initial_value (List[float]): The initial values of the random variables for each sim.
         num_points (int): The number of points to generate for each sim.
         num_rvs (int): The number of random variables for each sim.
         params (List): The base parameter arguments (e.g. loc, scale) of the random variables.
@@ -166,12 +166,16 @@ def multi_gbms(
     Returns:
         :class:`hypothesis.strategies.SearchStrategy[numpy.typing.ArrayLike]`
     """
-    check_type(float, initial_value, "initial_value")
+    check_type(list, initial_values, "initial_values")
     check_type(int, num_points, "num_points")
     check_type(int, num_rvs, "num_rvs")
     check_type(list, params, "params")
     check_type(list, scale, "scale")
     check_type(list, shift, "shift")
+
+    if len(initial_values) != num_rvs:
+        raise ValueError("Length of initial_values not same as num_rvs")
+
     if hist_data is not None:
         check_type(list, hist_data, "hist_data")
 
@@ -191,6 +195,6 @@ def multi_gbms(
     )
 
     def pack(x: npt.ArrayLike) -> npt.ArrayLike:
-        return initial_value * np.exp(np.cumsum(x, axis=0))  # axis=0 sums over rows
+        return initial_values * np.exp(np.cumsum(x, axis=0))  # axis=0 sums over rows
 
     return strat.map(pack)
