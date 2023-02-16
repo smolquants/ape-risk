@@ -102,6 +102,7 @@ def gbms(
     num_points: int,
     params: List,
     hist_data: Optional[List] = None,
+    r: Optional[float] = None,
 ) -> st.SearchStrategy[npt.ArrayLike]:
     """
     Generates instances of ``np.ndarray``. The generated random instances
@@ -112,6 +113,8 @@ def gbms(
         num_points (int): The number of points to generate for each sim.
         params (List): The parameter arguments (e.g. loc, scale) of the random variable.
         hist_data (Optional[List]): Historical data to fit the random variable params from.
+        r (Optional[float]): The risk-neutral interest rate. When not None,
+            adjusts sims to risk-neutral measure.
 
     Returns:
         :class:`hypothesis.strategies.SearchStrategy[numpy.typing.ArrayLike]`
@@ -131,8 +134,18 @@ def gbms(
         dist_type="norm", num_points=num_points, params=params, hist_data=hist_data
     )
 
+    shift = 0
+    if r is not None:
+        check_type(float, r, "r")
+
+        # adjust for risk-neutral if given risk-free rate
+        # S_t = S_0 * exp(mu_p*t + sigma * W_t); mu_p = mu - sigma**2 / 2
+        [mu_p, sigma] = strat._mc.params.tolist()
+        mu = mu_p + sigma**2 / 2
+        shift = r - mu
+
     def pack(x: npt.ArrayLike) -> npt.ArrayLike:
-        return initial_value * np.exp(np.cumsum(x, axis=0))  # axis=0 sums over rows
+        return initial_value * np.exp(np.cumsum(x + shift, axis=0))  # axis=0 sums over rows
 
     return strat.map(pack)
 
@@ -148,6 +161,7 @@ def multi_gbms(
     scale: List[List],
     shift: List,
     hist_data: Optional[List[List]] = None,
+    r: Optional[float] = None,
 ) -> st.SearchStrategy[npt.ArrayLike]:
     """
     Generates instances of ``np.ndarray``. The generated random instances
@@ -162,6 +176,8 @@ def multi_gbms(
         scale (List[List]): The scale matrix to mix random variables via affine transformation.
         shift (List): The shift vector to translate random variables via affine transformation.
         hist_data (Optional[List[List]]): Historical data to fit the random variable params from.
+        r (Optional[float]): The risk-neutral interest rate. When not None,
+            adjusts sims to risk-neutral measure.
 
     Returns:
         :class:`hypothesis.strategies.SearchStrategy[numpy.typing.ArrayLike]`
