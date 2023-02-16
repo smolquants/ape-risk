@@ -77,6 +77,24 @@ def test_gbms_param_fuzz(p):
     np.testing.assert_allclose(fit_params, [0.001, 0.005], rtol=2e-1)  # mu tol is not great
 
 
+@given(
+    strategies.gbms(
+        initial_value=1.0,
+        num_points=100000,
+        params=[0.001, 0.005],
+        r=0.0004,
+    )
+)
+def test_gbms_risk_neutral_fuzz(p):
+    assert p.shape == (100000, 1)
+    assert isinstance(p, np.ndarray)
+
+    # check distr of p is close to log normal with params
+    dlog_p = np.diff(np.log(p.T))
+    fit_params = stats.norm.fit(dlog_p)
+    np.testing.assert_allclose(fit_params, [0.0004, 0.005], rtol=2e-1)  # mu tol is not great
+
+
 @given(strategies.gbms(initial_value=1.0, num_points=100000, params=[0, 1], hist_data=hist_data()))
 def test_gbms_hist_fuzz(p):
     assert p.shape == (100000, 1)
