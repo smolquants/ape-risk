@@ -134,17 +134,19 @@ def gbms(
         dist_type="norm", num_points=num_points, params=params, hist_data=hist_data
     )
 
-    shift = 0.0
+    s = 0.0
     if r is not None:
         check_type(float, r, "r")
 
         # adjust for risk-neutral if given risk-free rate
         # S_t = S_0 * exp(mu_p * t + sigma * W_t); mu_p = mu - sigma**2 / 2
+        # dS_t = mu * S_t * dt + sigma * S_t * dW_t
         [mu_p, sigma] = strat._mc.params.tolist()
-        shift = r - (mu_p + sigma**2 / 2)
+        mu = mu_p + sigma**2 / 2
+        s = r - mu
 
     def pack(x: npt.ArrayLike) -> npt.ArrayLike:
-        return initial_value * np.exp(np.cumsum(np.add(x, shift), axis=0))  # axis=0 sums over rows
+        return initial_value * np.exp(np.cumsum(np.add(x, s), axis=0))  # axis=0 sums over rows
 
     return strat.map(pack)
 
@@ -209,7 +211,40 @@ def multi_gbms(
         hist_data=hist_data,
     )
 
+    s = np.zeros(
+        shape=(
+            len(
+                shift,
+            )
+        )
+    )
+    if r is not None:
+        check_type(float, r, "r")
+
+        # adjust for risk-neutral if given risk-free rate
+        # S_t = S_0 * exp(mu_p * t + sigma * W_t); mu_p = mu - sigma**2 / 2
+        # dS_t = mu * S_t * dt + sigma * S_t * dW_t
+        # mu_p_i = shift_i + params.loc * sum_j scale_{ij}
+        # sigma_i**2 = params.scale**2 * sum_j scale**2_{ij}
+        [mu_p, sigma] = strat._mmc.params.tolist()
+
+        mus_p = np.ones(shape=(len(shift),)) * mu_p
+        sigmas = np.ones(shape=(len(shift),)) * sigma
+        mmc_shift = strat._mmc.shift  # transformed to np.ndarrays
+        mmc_scale = strat._mmc.scale
+
+        # elementwise squares
+        sigmas_sqrd = np.square(sigmas)
+        mmc_scale_sqrd = np.square(mmc_scale)
+
+        mus = (
+            mmc_shift
+            + np.einsum("j,ij", mus_p, mmc_scale)
+            + np.einsum("j,ij", sigmas_sqrd, mmc_scale_sqrd) / 2.0
+        )
+        s = r - mus
+
     def pack(x: npt.ArrayLike) -> npt.ArrayLike:
-        return initial_values * np.exp(np.cumsum(x, axis=0))  # axis=0 sums over rows
+        return initial_values * np.exp(np.cumsum(np.add(x, s), axis=0))  # axis=0 sums over rows
 
     return strat.map(pack)
