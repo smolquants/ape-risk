@@ -77,6 +77,24 @@ def test_gbms_param_fuzz(p):
     np.testing.assert_allclose(fit_params, [0.001, 0.005], rtol=2e-1)  # mu tol is not great
 
 
+@given(
+    strategies.gbms(
+        initial_value=1.0,
+        num_points=100000,
+        params=[0.001, 0.005],
+        r=0.0004,
+    )
+)
+def test_gbms_param_risk_neutral_fuzz(p):
+    assert p.shape == (100000, 1)
+    assert isinstance(p, np.ndarray)
+
+    # check distr of p is close to log normal with params
+    dlog_p = np.diff(np.log(p.T))
+    fit_params = stats.norm.fit(dlog_p)
+    np.testing.assert_allclose(fit_params, [0.0003875, 0.005], rtol=2e-1)  # mu tol is not great
+
+
 @given(strategies.gbms(initial_value=1.0, num_points=100000, params=[0, 1], hist_data=hist_data()))
 def test_gbms_hist_fuzz(p):
     assert p.shape == (100000, 1)
@@ -90,7 +108,7 @@ def test_gbms_hist_fuzz(p):
 
 @given(
     strategies.multi_gbms(
-        initial_value=1.0,
+        initial_values=[1.0, 0.9, 0.8],
         num_points=100000,
         num_rvs=3,
         params=[0, 0.005],
@@ -101,6 +119,9 @@ def test_gbms_hist_fuzz(p):
 def test_multi_gbms_param_fuzz(p):
     assert p.shape == (100000, 1, 3)
     assert isinstance(p, np.ndarray)
+
+    # check initial values of sim close to same as specified (since start at t=1)
+    np.testing.assert_allclose(p.reshape((100000, 3))[0], [1.0, 0.9, 0.8], 0.005 * 10)
 
     # check distr of p is close to log normal with params
     dlog_p = np.diff(np.log(p.reshape(100000, 3)), axis=0)
@@ -116,7 +137,39 @@ def test_multi_gbms_param_fuzz(p):
 
 @given(
     strategies.multi_gbms(
-        initial_value=1.0,
+        initial_values=[1.0, 0.9, 0.8],
+        num_points=100000,
+        num_rvs=3,
+        params=[0, 0.005],  # TODO: check for non-zero params[0]
+        scale=scale(),
+        shift=[0.001, 0.002, 0.003],
+        r=0.0004,
+    )
+)
+def test_multi_gbms_param_risk_neutral_fuzz(p):
+    assert p.shape == (100000, 1, 3)
+    assert isinstance(p, np.ndarray)
+
+    # check initial values of sim close to same as specified (since start at t=1)
+    np.testing.assert_allclose(p.reshape((100000, 3))[0], [1.0, 0.9, 0.8], 0.005 * 10)
+
+    # check distr of p is close to log normal with params
+    dlog_p = np.diff(np.log(p.reshape(100000, 3)), axis=0)
+    fit_shift = np.mean(dlog_p, axis=0)
+    C = np.cov(dlog_p.T)
+    fit_scale = np.linalg.cholesky(C)
+
+    np.testing.assert_allclose(
+        fit_scale, np.asarray(scale()) * 0.005, rtol=2e-1
+    )  # cov tol is not great
+    np.testing.assert_allclose(
+        fit_shift, [0.0003875, 0.0003875, 0.0003875], 2e-1
+    )  # mu tol is not great
+
+
+@given(
+    strategies.multi_gbms(
+        initial_values=[1.0, 0.9, 0.8],
         num_points=100000,
         num_rvs=3,
         params=[0, 1],
@@ -128,6 +181,9 @@ def test_multi_gbms_param_fuzz(p):
 def test_multi_gbms_hist_fuzz(p):
     assert p.shape == (100000, 1, 3)
     assert isinstance(p, np.ndarray)
+
+    # check initial values of sim close to same as specified (since start at t=1)
+    np.testing.assert_allclose(p.reshape((100000, 3))[0], [1.0, 0.9, 0.8], 0.005 * 10)
 
     # check distr of p is close to log normal with params
     dlog_p = np.diff(np.log(p.reshape(100000, 3)), axis=0)

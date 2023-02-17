@@ -48,7 +48,7 @@ C = np.asarray([[1, 0.5, 0.8], [0.5, 1, 0.4], [0.8, 0.4, 1]])
 scale = np.linalg.cholesky(C).tolist()
 
 
-@given(strategies.multi_gbms(initial_value=1.0, num_points=100000, num_rvs=3, params=[0, 0.005], scale=scale, shift=[0, 0, 0]))
+@given(strategies.multi_gbms(initial_values=[1.0, 0.9, 0.8], num_points=100000, num_rvs=3, params=[0, 0.005], scale=scale, shift=[0, 0, 0]))
 def test_multi_gbms_param_fuzz(p):
     # strat gives a numpy.ndarray of multiple simulated prices for each hypothesis run
     assert p.shape == (100000, 1, 3)
