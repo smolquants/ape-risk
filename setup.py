@@ -53,7 +53,7 @@ setup(
     url="https://github.com/smolquants/ape-risk",
     include_package_data=True,
     install_requires=[
-        "eth-ape>=0.5.2,<0.6.0",
+        "eth-ape>=0.6.12,<0.7.0",
         "pandas",
         "scipy",
         "numpy>=1.21,<2.0",
@@ -78,5 +78,6 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
     ],
 )
